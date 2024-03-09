@@ -39,29 +39,15 @@
 <body>
   <div id="code">
     <!-- Place your code here -->
-    <p>BERLIN<span id="randomNumber"></span></p>
+    <p>BERLIN4567</p>
   </div>
   <button id="copyButton" onclick="copyCode()">COPY</button>
   <script>
-    function generateRandomNumber() {
-      return Math.floor(Math.random() * 99999) + 1;
-    }
-    
-    function updateCode() {
-      document.getElementById("randomNumber").innerText = generateRandomNumber();
-    }
-    
     function copyCode() {
       var code = document.getElementById("code").innerText;
       navigator.clipboard.writeText(code);
       alert("Code copied!");
     }
-    
-    // Update code every 5 minutes
-    setInterval(updateCode, 30000);
-    
-    // Initial code update
-    updateCode();
   </script>
 </body>
 </html>
