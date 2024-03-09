@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BerlinXYZ</title>
+<style>
+  body {
+    background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1yHtjq85DOsN6593lzcTaSA2S5h56u2ElpHgolNObvaNVWGdEK59-_ik&s=10');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: red;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  #copyButton {
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border: 2px solid yellow;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  #copyButton:hover {
+    background-color: darkred;
+  }
+  #code {
+    background-color: yellow;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+  }
+</style>
+</head>
+<body>
+  <div id="code">
+    <!-- Place your code here -->
+    <p>BERLIN<span id="randomNumber"></span></p>
+  </div>
+  <button id="copyButton" onclick="copyCode()">COPY</button>
+  <script>
+    function generateRandomNumber() {
+      return Math.floor(Math.random() * 99999) + 1;
+    }
+    
+    function updateCode() {
+      document.getElementById("randomNumber").innerText = generateRandomNumber();
+    }
+    
+    function copyCode() {
+      var code = document.getElementById("code").innerText;
+      navigator.clipboard.writeText(code);
+      alert("Code copied!");
+    }
+    
+    // Update code every 5 minutes
+    setInterval(updateCode, 30000);
+    
+    // Initial code update
+    updateCode();
+  </script>
+</body>
+</html>
