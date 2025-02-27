@@ -1,53 +1,149 @@
+.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BerlinXYZ</title>
-<style>
-  body {
-    background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1yHtjq85DOsN6593lzcTaSA2S5h56u2ElpHgolNObvaNVWGdEK59-_ik&s=10');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-color: red;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  #copyButton {
-    background-color: red;
-    color: white;
-    padding: 10px 20px;
-    border: 2px solid yellow;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  #copyButton:hover {
-    background-color: darkred;
-  }
-  #code {
-    background-color: yellow;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOUR PRINCE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(45deg, #0a0a0a, #1a1a1a);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .quote-container {
+            text-align: center;
+            color: #fff;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            margin: 20px;
+            transform: translateY(0);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .quote {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            line-height: 1.4;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .contact-btn {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .contact-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .contact-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .contact-btn:hover::before {
+            left: 100%;
+        }
+    </style>
 </head>
 <body>
-  <div id="code">
-    <!-- Place your code here -->
-    <p>BERLIN6386</p>
-  </div>
-  <button id="copyButton" onclick="copyCode()">COPY</button>
-  <script>
-    function copyCode() {
-      var code = document.getElementById("code").innerText;
-      navigator.clipboard.writeText(code);
-      alert("Code copied!");
-    }
-  </script>
+    <div class="quote-container">
+        <p class="quote">HI MAYBE YOU KNOW ME , MAYBE <br> I WANT TO TALK TO YOU PLEASE TAP TO BUTTON </p>
+        <a href="https://www.instagram.com/the__.__spider?igsh=MTFweWw3MmNwbXE4aA==" target="_blank">
+            <button class="contact-btn">Contact Me</button>
+        </a>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            for(let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.opacity = Math.random();
+                document.body.appendChild(particle);
+            }
+        }
+
+        createParticles();
+    </script>
 </body>
 </html>
