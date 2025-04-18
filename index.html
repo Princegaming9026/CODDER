@@ -1,1 +1,17 @@
-<h1>शीघ्र ही मुलाकात होगी</h1>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DASH Video Playback</title>
+  <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+</head>
+<body style="background: #000; color: white; text-align: center;">
+  <h2>Video Stream Playback</h2>
+  <video id="videoPlayer" controls width="800" autoplay></video>
+
+  <script>
+    const url = "https://house-fastly-signed-ap-southeast-1-prod.brightcovecdn.com/media/v1/dash/live/cenc/6206459123001/b0f6c1e4-c87e-4b0b-b380-534d5c59ee95/494aed01-62cd-4ae3-9800-d47ba82d2e86/f76797b2-af4a-4315-8141-967243c6a312/manifest.mpd";
+    const player = dashjs.MediaPlayer().create();
+    player.initialize(document.querySelector("#videoPlayer"), url, true);
+  </script>
+</body>
+</html>
