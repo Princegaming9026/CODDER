@@ -1,34 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DASH Video Playback</title>
-  <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
-  <style>
-    body {
-      background-color: black;
-      color: white;
-      text-align: center;
-    }
-    video {
-      width: 80%;
-      max-width: 1200px;
-      height: auto;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brightcove Video Player</title>
 </head>
 <body>
-  <h1>DASH Video Playback</h1>
-  <video id="videoPlayer" controls></video>
+    <h1>Brightcove Video Player</h1>
 
-  <script>
-    // Replace with the actual DASH Manifest URL (if available)
-    var manifestUrl = 'http://house-fastly-signed-ap-southeast-1-prod.brightcovecdn.com/media/v1/dash/live/cenc/6206459123001/b0f6c1e4-c87e-4b0b-b380-534d5c59ee95/494aed01-62cd-4ae3-9800-d47ba82d2e86/11702b6c-7f7b-4da9-919e-830118061ab0/3x/manifest.mpd'; 
+    <!-- Video Embed Section -->
+    <div id="video-container"></div>
 
-    // Initialize the dash.js player
-    var player = dashjs.MediaPlayer().create();
-    player.initialize(document.querySelector("#videoPlayer"), manifestUrl, true);
-  </script>
+    <script>
+        // API URL for the video
+        const apiUrl = "https://edge.api.brightcove.com/playback/v1/accounts/6206459123001/videos/6368750600112";
+
+        // Fetch the video data from the Brightcove API
+        fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'BCOV-POLICY': 'BCpkADawqM1VmXspFMod94-pT7xDCvmBEYt8U7f0mRB6XnG5huPE7I9qjhDW0qpx3LRyTD9WX7W6JvUGtgKN-qf1pJoZO-QXBMIykDivtAOgkJOmN-kyv4m_F0thrJ45z95hqWON0nsKBwvd'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); // Check the data to see the structure
+
+            // Assuming the API response contains a video URL at 'data.sources[0].src'
+            const videoUrl = data.sources[0].src; // Modify this based on actual API response
+
+            // Check if videoUrl is valid
+            if (videoUrl) {
+                // Create a video element and set its source
+                const videoContainer = document.getElementById('video-container');
+                const videoElement = document.createElement('video');
+                videoElement.controls = true;
+                videoElement.src = videoUrl;
+
+                // Append the video element to the container
+                videoContainer.appendChild(videoElement);
+            } else {
+                console.error("Video URL not found in API response.");
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching video data: ", error);
+        });
+    </script>
 </body>
 </html>
