@@ -13,18 +13,37 @@
             align-items: center;
             height: 100vh;
             flex-direction: column;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
         }
         input, button {
             padding: 10px;
             margin: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3700b3;
         }
     </style>
 </head>
 <body>
-    <h2>Enter Key</h2>
-    <form action="validate.php" method="post">
-        <input type="password" name="user_key" placeholder="Enter your key">
-        <button type="submit">Submit</button>
-    </form>
+    <div class="container">
+        <h2>Enter Key</h2>
+        <form action="validate.php" method="post">
+            <input type="text" name="user_key" placeholder="Enter your key">
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 </body>
 </html>
