@@ -1,7 +1,7 @@
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $enteredKey = $_POST['user_key'];
-    $secureKey = "BERLIN1";  // Hardcoded key (better to store in environment variables)
+    $secureKey = "BERLIN1";
 
     if ($enteredKey === $secureKey) {
         header("Location: success.php");
