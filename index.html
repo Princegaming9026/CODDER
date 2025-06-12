@@ -36,8 +36,8 @@
                 });
                 const data = await res.json();
                 output.textContent = JSON.stringify(data, null, 2);
-                if (data.status === "success" && data.list && data.list[0] && data.list[0].dlink) {
-                    player.src = data.list[0].dlink;
+                if (data.status === "success" && data.download_link && data.download_link.url_1) {
+                    player.src = data.download_link.url_1;
                     player.load();
                     player.play();
                 } else {
