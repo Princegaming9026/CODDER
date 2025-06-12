@@ -26,7 +26,7 @@
             output.textContent = "Loading...";
             player.src = "";
             try {
-                // Apne Cloudflare Worker/proxy ka URL yahan lagayein
+                // Apne Cloudflare Worker ka URL yahan lagayein
                 const workerBase = 'https://terabypassprince.py981962.workers.dev';
                 const res = await fetch(workerBase + '/', {
                     method: 'POST',
@@ -40,12 +40,11 @@
                 output.textContent = JSON.stringify(data, null, 2);
                 if (data.status === "success" && data.download_link) {
                     if (data.download_link.url_1) {
-                        // Try direct link first
                         player.src = data.download_link.url_1;
                         player.load();
                         player.play();
                     } else if (data.download_link.url_2) {
-                        // Use streaming proxy for url_2
+                        // Streaming proxy endpoint
                         const encoded = encodeURIComponent(data.download_link.url_2);
                         player.src = `${workerBase}/stream?url=${encoded}`;
                         player.load();
