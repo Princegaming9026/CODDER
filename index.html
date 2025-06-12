@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Terabox Player (Cloudflare Worker)</title>
+    <title>Terabox Video Player</title>
     <style>
         body { background: #222; color: #fff; text-align: center; }
         input { width: 60vw; padding: 10px; }
@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-    <h1>Terabox Player (Cloudflare Worker)</h1>
+    <h1>Terabox Video Player</h1>
     <input type="text" id="videoUrl" placeholder="Paste Terabox share link here">
     <button onclick="playVideo()">Play</button>
     <br>
@@ -26,6 +26,7 @@
             output.textContent = "Loading...";
             player.src = "";
             try {
+                // Apne Cloudflare Worker/proxy ka URL yahan lagayein
                 const res = await fetch('https://terabypassprince.py981962.workers.dev/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
