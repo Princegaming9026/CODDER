@@ -2,48 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Key Input</title>
+    <title>Terabox Player (New API)</title>
     <style>
-        body {
-            background-color: black;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        input, button {
-            padding: 10px;
-            margin: 10px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #6200ea;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #3700b3;
-        }
+        body { background: #222; color: #fff; text-align: center; }
+        input { width: 60vw; padding: 10px; }
+        button { padding: 10px 20px; }
+        video { width: 80vw; height: 60vh; margin-top: 30px; }
+        pre { background: #333; color: #0f0; text-align: left; margin: 20px auto; width: 80vw; padding: 20px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Enter Key</h2>
-        <form action="validate.php" method="post">
-            <input type="text" name="user_key" placeholder="Enter your key">
-            <button type="submit">Submit</button>
-        </form>
-    </div>
+    <h1>Terabox Player (New API)</h1>
+    <input type="text" id="videoUrl" placeholder="Paste Terabox share link here">
+    <button onclick="playVideo()">Play</button>
+    <br>
+    <video id="player" controls></video>
+    <pre id="output"></pre>
+    <script>
+        async function playVideo() {
+            const shareUrl = document.getElementById('videoUrl').value;
+            const output = document.getElementById('output');
+            const player = document.getElementById('player');
+            output.textContent = "Loading...";
+            player.src = "";
+            try {
+                const res = await <fetch('https://terabypassprince.py981962.workers.dev/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: "3",
+                        url: shareUrl
+                    })
+                });
+                const data = await res.json();
+                output.textContent = JSON.stringify(data, null, 2);
+                if (data.status === "success" && data.download_link) {
+                    player.src = data.download_link;
+                    player.load();
+                    player.play();
+                } else {
+                    output.textContent += "\nDirect link nahi mila!";
+                }
+            } catch (e) {
+                output.textContent = "Error: " + e;
+            }
+        }
+    </script>
 </body>
 </html>
