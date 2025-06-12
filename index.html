@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Terabox Video Player</title>
+    <title>Terabox Video Player (Streaming Proxy)</title>
     <style>
         body { background: #222; color: #fff; text-align: center; }
         input { width: 60vw; padding: 10px; }
@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-    <h1>Terabox Video Player</h1>
+    <h1>Terabox Video Player (Streaming Proxy)</h1>
     <input type="text" id="videoUrl" placeholder="Paste Terabox share link here">
     <button onclick="playVideo()">Play</button>
     <br>
@@ -27,7 +27,8 @@
             player.src = "";
             try {
                 // Apne Cloudflare Worker/proxy ka URL yahan lagayein
-                const res = await fetch('https://terabypassprince.py981962.workers.dev/', {
+                const workerBase = 'https://terabypassprince.py981962.workers.dev';
+                const res = await fetch(workerBase + '/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -39,11 +40,14 @@
                 output.textContent = JSON.stringify(data, null, 2);
                 if (data.status === "success" && data.download_link) {
                     if (data.download_link.url_1) {
+                        // Try direct link first
                         player.src = data.download_link.url_1;
                         player.load();
                         player.play();
                     } else if (data.download_link.url_2) {
-                        player.src = data.download_link.url_2;
+                        // Use streaming proxy for url_2
+                        const encoded = encodeURIComponent(data.download_link.url_2);
+                        player.src = `${workerBase}/stream?url=${encoded}`;
                         player.load();
                         player.play();
                     } else {
