@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mili – Your AI Bestie</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #ffe3ec, #f8f0ff);
+      font-family: 'Comic Sans MS', cursive;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #chat {
+      padding: 20px;
+      max-height: 100vh;
+      overflow-y: auto;
+    }
+    .bubble {
+      background: white;
+      border-radius: 20px;
+      padding: 10px 16px;
+      margin: 10px;
+      max-width: 75%;
+      animation: fadeIn 0.6s ease-out;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="chat"></div>
+  <script>
+    const chat = document.getElementById("chat");
+    let history = [];
+
+    function addBubble(text, sender = "mili") {
+      const div = document.createElement("div");
+      div.className = "bubble";
+      div.style.background = sender === "mili" ? "#ffffff" : "#d7f0ff";
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function speak(text) {
+      const res = await fetch("/api/tts.js", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audio.play();
+    }
+
+    async function askMili(text) {
+      addBubble(text, "you");
+      const res = await fetch("/api/chat.js", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: text, history })
+      });
+      const data = await res.json();
+      const reply = data.reply;
+      history.push({ role: "user", content: text });
+      history.push({ role: "assistant", content: reply });
+      addBubble(reply, "mili");
+      speak(reply);
+    }
+
+    function autoListen() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return alert("Your browser does not support SpeechRecognition.");
+      const recog = new SR();
+      recog.lang = "hi-IN";
+      recog.continuous = false;
+      recog.interimResults = false;
+      recog.start();
+      recog.onresult = e => {
+        const msg = e.results[0][0].transcript;
+        askMili(msg);
+        setTimeout(autoListen, 1000);
+      };
+      recog.onend = () => setTimeout(autoListen, 1000);
+    }
+
+    window.onload = () => {
+      setTimeout(autoListen, 2000);
+    };
+  </script>
+</body>
+</html>
