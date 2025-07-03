@@ -1,52 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Terabox Player (Cloudflare Worker)</title>
-    <style>
-        body { background: #222; color: #fff; text-align: center; }
-        input { width: 60vw; padding: 10px; }
-        button { padding: 10px 20px; }
-        video { width: 80vw; height: 60vh; margin-top: 30px; }
-        pre { background: #333; color: #0f0; text-align: left; margin: 20px auto; width: 80vw; padding: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Mili - Your AI Bestie</title>
+  <style>
+    body { background: #fceff9; font-family: Arial; padding: 20px; text-align: center; }
+    #chat { max-width: 600px; margin: auto; padding: 10px; }
+    .bubble { padding: 10px 15px; margin: 10px; border-radius: 15px; display: inline-block; max-width: 70%; }
+    .user { background: #cce5ff; align-self: flex-end; }
+    .mili { background: #fff; border: 1px solid #eee; }
+    #mic { font-size: 30px; padding: 15px 30px; margin-top: 20px; border: none; border-radius: 30px; background: #ff91a4; color: white; }
+  </style>
 </head>
 <body>
-    <h1>Terabox Player (Cloudflare Worker)</h1>
-    <input type="text" id="videoUrl" placeholder="Paste Terabox share link here">
-    <button onclick="playVideo()">Play</button>
-    <br>
-    <video id="player" controls></video>
-    <pre id="output"></pre>
-    <script>
-        async function playVideo() {
-            const shareUrl = document.getElementById('videoUrl').value;
-            const output = document.getElementById('output');
-            const player = document.getElementById('player');
-            output.textContent = "Loading...";
-            player.src = "";
-            try {
-                const res = await fetch('https://terabypassprince.py981962.workers.dev/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        mode: "3",
-                        url: shareUrl
-                    })
-                });
-                const data = await res.json();
-                output.textContent = JSON.stringify(data, null, 2);
-                if (data.status === "success" && data.list && data.list[0] && data.list[0].dlink) {
-                    player.src = data.list[0].dlink;
-                    player.load();
-                    player.play();
-                } else {
-                    output.textContent += "\nDirect link nahi mila!";
-                }
-            } catch (e) {
-                output.textContent = "Error: " + e;
-            }
-        }
-    </script>
+  <h2>👩🏻‍🦰 Mili – Tumhari Pyari Dost</h2>
+  <div id="chat"></div>
+  <button id="mic">🎙️ Start Talking</button>
+
+  <script>
+    const openaiKey = "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";
+    const elevenKey = "sk_035d32b90f52ac8b2627c8edf19f61ec1b642c3ec04c289d";
+    const voiceId = "EXAVITQu4vr4xnSDxMaL"; // Default ElevenLabs voice
+
+    let conversation = [];
+
+    const chatBox = document.getElementById("chat");
+    const micButton = document.getElementById("mic");
+
+    function addMessage(text, sender) {
+      const div = document.createElement("div");
+      div.className = `bubble ${sender}`;
+      div.textContent = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function speak(text) {
+      fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`, {
+        method: "POST",
+        headers: {
+          "xi-api-key": elevenKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          text,
+          voice_settings: { stability: 0.5, similarity_boost: 0.8 }
+        })
+      })
+      .then(res => res.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.play();
+      });
+    }
+
+    async function askMili(userText) {
+      addMessage(userText, "user");
+
+      conversation.push({ role: "user", content: userText });
+
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${openaiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: "Tum Mili ho – Prince ki best friend. Tumhara tone pyara, emotional aur caring hai. Hamesha uski baaton ko samajhkar life ke suggestions do." },
+            ...conversation
+          ]
+        })
+      });
+
+      const data = await res.json();
+      const reply = data.choices[0].message.content;
+      conversation.push({ role: "assistant", content: reply });
+      addMessage(reply, "mili");
+      speak(reply);
+    }
+
+    function startSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Speech recognition not supported in your browser.");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = "hi-IN";
+      recognition.start();
+
+      micButton.disabled = true;
+      micButton.textContent = "🎧 Listening...";
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        askMili(transcript);
+      };
+
+      recognition.onend = () => {
+        micButton.disabled = false;
+        micButton.textContent = "🎙️ Start Talking";
+      };
+    }
+
+    micButton.addEventListener("click", startSpeechRecognition);
+  </script>
 </body>
 </html>
