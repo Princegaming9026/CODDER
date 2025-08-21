@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DigiShakti × Instagram — Safe Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1220;--card:#101a30;--text:#eef2ff;--sub:#c7d2fe;--border:#263455;
+      --accent:#7c3aed;--accent2:#10b981;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Poppins,system-ui;-webkit-font-smoothing:antialiased;background:var(--bg);color:var(--text)}
+    header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);background:#0f1930cc;backdrop-filter:blur(6px)}
+    header img{height:54px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35))}
+    .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
+    .hero img{width:100%;height:360px;object-fit:cover;display:block}
+    .hero .title{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px}
+    .hero h1{margin:0;font-size:clamp(24px,4vw,42px);line-height:1.15}
+    .marq{border-top:1px dashed var(--border);border-bottom:1px dashed var(--border);background:#0f1930aa}
+    marquee{padding:10px 0;font-weight:700}
+    .wrap{max-width:1100px;margin-inline:auto;padding:16px}
+    .card{margin:22px auto;background:linear-gradient(180deg,#111a32,#0a1020);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+    .in{padding:18px 18px 22px}
+    .row{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+    .col{flex:1 1 280px}
+    .ig{width:56px;height:56px;object-fit:contain}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border-radius:12px;border:1px solid var(--border);text-decoration:none;color:var(--text);font-weight:600;cursor:pointer;transition:.2s}
+    .btn:hover{transform:translateY(-1px)}
+    .primary{background:linear-gradient(180deg,rgba(124,58,237,.35),rgba(124,58,237,.15))}
+    .ghost{background:linear-gradient(180deg,rgba(16,185,129,.25),rgba(16,185,129,.1))}
+    .note{font-size:14px;color:var(--sub)}
+    footer{padding:24px 16px;text-align:center;color:#aab3cf}
+  </style>
+</head>
+<body>
+  <!-- Header with Logos -->
+  <header>
+    <img src="https://digishakti.up.gov.in/images/logo.png" alt="Government of Uttar Pradesh" title="Government of Uttar Pradesh" />
+    <img src="https://digishakti.up.gov.in/images/digilogo.png" alt="DigiShakti" title="DigiShakti" />
+  </header>
+
+  <!-- Hero / Theme Banner -->
+  <section class="hero">
+    <img src="https://digishakti.up.gov.in/images/slider-5.jpg" alt="DigiShakti Theme" />
+    <div class="title">
+      <h1>DigiShakti × Instagram — सुरक्षित डिजिटल कनेक्ट</h1>
+    </div>
+  </section>
+
+  <!-- Marquee: Swami Vivekananda -->
+  <div class="marq">
+    <marquee behavior="scroll" direction="left" scrollamount="6">
+      <div class="swami-text">स्वामी विवेकानन्द युवा सशक्तिकरण योजना</div>
+    </marquee>
+  </div>
+
+  <!-- Connect Card -->
+  <main class="wrap">
+    <div class="card">
+      <div class="in">
+        <div class="row" style="align-items:flex-start">
+          <div class="col">
+            <h2 style="margin:6px 0 8px">Connect with Instagram (Official OAuth)</h2>
+            <p class="note">यह कनेक्शन Instagram OAuth से होता है — आपका पासवर्ड इस साइट पर कभी नहीं आता/स्टोर होता।</p>
+
+            <!-- Replace YOUR_INSTAGRAM_APP_ID and YOUR_REDIRECT_URI with your actual values -->
+            <a class="btn primary" id="igConnectBtn"
+               href="https://api.instagram.com/oauth/authorize?client_id=YOUR_INSTAGRAM_APP_ID&redirect_uri=YOUR_REDIRECT_URI&scope=user_profile&response_type=code">
+              Connect with Instagram
+            </a>
+
+⫸𝐁𝐄𝐑𝐋𝐈𝐍⫷, [21-08-2025 08:51]
+<div style="margin-top:14px">
+              <button class="btn ghost" id="notifyBtn" type="button">Notify Telegram (Log only)</button>
+              <p class="note">यह बटन केवल तारीख/समय + activity का log Telegram पर भेजता है (कोई password/PII नहीं)।</p>
+            </div>
+          </div>
+          <div class="col" style="text-align:center">
+            <img class="ig" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxBzH8UEnwhZ3xdq-cC4D9_dK4nu_Cjk9p-Q&s" alt="Instagram Icon" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>© <span id="yr"></span> DigiShakti × Instagram — Safe Connect</footer>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // Notify Telegram (non-sensitive log)
+    document.getElementById('notifyBtn').addEventListener('click', async () => {
+      const now = new Date();
+      const payload = {
+        when: now.toISOString(),
+        tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        note: 'User clicked Connect (test log)'
+      };
+      try {
+        const res = await fetch('notify.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        alert(data.ok ? 'Telegram notified ✅' : 'Failed to notify ❌');
+      } catch (e) {
+        alert('Failed to notify ❌');
+      }
+    });
+  </script>
+</body>
+</html>
